@@ -61,3 +61,7 @@ Python tests cover plan validation, recurring/project protections and review tok
 - [Things export options](https://culturedcode.com/things/support/articles/2982272/)
 - [Supported AppleScript operations](https://culturedcode.com/things/support/articles/4562654/)
 - [Shortcuts options for additional properties](https://culturedcode.com/things/support/articles/9596775/)
+
+## Create a reference idea
+
+`osascript create-idea.applescript "Title" "Notes"` explicitly creates one Someday task and verifies its title and notes. It refuses an existing current task with the same title. Invoke only for an approved creation; if execution is interrupted, inspect Things before retrying. This helper does not use the change-plan workflow.
