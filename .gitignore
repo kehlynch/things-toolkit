@@ -1,0 +1,6 @@
+local/
+*.sqlite*
+things-data.json
+summary.json
+__pycache__/
+.DS_Store
