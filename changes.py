@@ -34,6 +34,22 @@ def build(data, requests):
 
 def digest(plan): return hashlib.sha256(json.dumps(plan,sort_keys=True).encode()).hexdigest()
 def run(plan,mode):
+    if mode == 'apply' and any(op['action']=='move' for op in plan['operations']):
+        run(plan,'preview')
+        results=[]
+        for op in plan['operations']:
+            try:
+                single={**plan,'operations':[op]}
+                if op['action']=='move':
+                    run(single,'preview')
+                    subprocess.run(['/usr/bin/osascript',str(ROOT/'move-item.applescript'),op['id'],op['destinationId'],op['before']['name'],op['before']['notes']],capture_output=True,text=True,check=True,timeout=60)
+                    results.append({'id':op['id'],'ok':True})
+                else:
+                    result=run(single,'apply');results.extend(result['results'])
+                    if not result['complete']: break
+            except Exception as e:
+                results.append({'id':op['id'],'ok':False,'error':str(e)});break
+        return {'results':results,'complete':len(results)==len(plan['operations']) and all(r['ok'] for r in results)}
     # Freeze the validated document; do not reread an editable request file in the runner.
     with tempfile.NamedTemporaryFile(mode='w',suffix='.json',dir=LOCAL) as frozen:
         json.dump(plan,frozen); frozen.flush()
